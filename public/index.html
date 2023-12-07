@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script>
+      const chatbox = document.getElementById("chatbox");
+      const chatContainer = document.getElementById("chat-container");
+      const userInput = document.getElementById("user-input");
+      const sendButton = document.getElementById("send-button");
+      const openChatButton = document.getElementById("open-chat");
+      const closeChatButton = document.getElementById("close-chat");
+
+      let isChatboxOpen = true; // Set the initial state to open
+
+      // Function to toggle the chatbox visibility
+      function toggleChatbox() {
+        chatContainer.classList.toggle("hidden");
+        isChatboxOpen = !isChatboxOpen; // Toggle the state
+      }
+
+      // Add an event listener to the open chat button
+      openChatButton.addEventListener("click", toggleChatbox);
+
+      // Add an event listener to the close chat button
+      closeChatButton.addEventListener("click", toggleChatbox);
+
+      // Add an event listener to the send button
+      sendButton.addEventListener("click", function () {
+        const userMessage = userInput.value;
+        if (userMessage.trim() !== "") {
+          addUserMessage(userMessage);
+          respondToUser(userMessage);
+          userInput.value = "";
+        }
+      });
+
+      userInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+          const userMessage = userInput.value;
+          addUserMessage(userMessage);
+          respondToUser(userMessage);
+          userInput.value = "";
+        }
+      });
+
+      function addUserMessage(message) {
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("mb-2", "text-right");
+        messageElement.innerHTML = `<p class="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block">${message}</p>`;
+        chatbox.appendChild(messageElement);
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+
+      function addBotMessage(message) {
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("mb-2");
+        messageElement.innerHTML = `<p class="bg-gray-200 text-gray-700 rounded-lg py-2 px-4 inline-block">${message}</p>`;
+        chatbox.appendChild(messageElement);
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+
+      function respondToUser(userMessage) {
+        // Replace this with your chatbot logic
+        setTimeout(() => {
+          addBotMessage("This is a response from the chatbot.");
+        }, 500);
+      }
+
+      // Automatically open the chatbox on page load
+      toggleChatbox();
+    </script>
+  </body>
+</html>
