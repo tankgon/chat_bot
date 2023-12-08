@@ -62,7 +62,7 @@ function App() {
       const cloudinaryData = await cloudinaryResponse.json();
       const imageUrl = await cloudinaryData.url;
 
-      const res = await axios.post("http://192.168.1.03:8080/chat-with-file", {
+      const res = await axios.post("https://chat-gpt-server-wk4y.onrender.com/chat-with-file", {
         topic: mess == "" ? "Hello" : response ? response : mess,
         message: mess,
         filePath: imageUrl,
@@ -80,21 +80,23 @@ function App() {
   const handleTextUpload = async () => {
     try {
       setLoading(true);
-      const res = await axios.post("http://192.168.1.03:8080/chat", {
+      const res = await axios.post("https://chat-gpt-server-wk4y.onrender.com/chat", {
         topic: mess == "" ? "Hello" : response ? response : mess,
         message: mess,
       });
       setRespon(res.data.reply);
       mstory.push({ me: mess, you: res.data.reply });
     } catch (error) {
-      console.error("Error uploading file:", error);
+      alert("Error uploading file:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div id="chat-container" className="fixed right-4 bottom-4 w-[30rem]">
+    <div
+      id="chat-container"
+      className="fixed right-4 bottom-4 w-[20rem] md:w-[20rem] lg:w-[30rem]">
       <div className="bg-white shadow-md rounded-lg w-full">
         <div className="p-4 border-b bg-blue-500 text-white rounded-t-lg flex justify-between items-center">
           <p className="text-lg font-semibold">Admin Bot</p>
