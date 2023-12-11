@@ -80,11 +80,14 @@ function App() {
       const cloudinaryData = await cloudinaryResponse.json();
       const imageUrl = await cloudinaryData.url;
 
-      const res = await axios.post("https://chat-gpt-server-wk4y.onrender.com/chat-with-file", {
-        topic: mess == "" ? "Hello" : response ? response : mess,
-        message: mess,
-        filePath: imageUrl,
-      });
+      const res = await axios.post(
+        "https://chat-gpt-server-wk4y.onrender.com/chat-with-file",
+        {
+          topic: mess == "" ? "Hello" : response ? response : mess,
+          message: mess,
+          filePath: imageUrl,
+        }
+      );
 
       setRespon(res.data.reply);
       setStory([
@@ -95,7 +98,7 @@ function App() {
     } catch (error) {
       setStory([
         ...mstory,
-        { me: mess, fileName: file.name, you: "Xin lỗi file quá lớn" },
+        { me: mess, fileName: file.name, you: "Sorry the file is too large" },
       ]);
     } finally {
       setLoading(false);
@@ -105,10 +108,13 @@ function App() {
   const handleTextUpload = async () => {
     try {
       setLoading(true);
-      const res = await axios.post("https://chat-gpt-server-wk4y.onrender.com/chat", {
-        topic: mess == "" ? "Hello" : response ? response : mess,
-        message: transcript ? transcript : mess,
-      });
+      const res = await axios.post(
+        "https://chat-gpt-server-wk4y.onrender.com/chat",
+        {
+          topic: mess == "" ? "Hello" : response ? response : mess,
+          message: transcript ? transcript : mess,
+        }
+      );
       setRespon(res.data.reply);
       mstory.push({ me: transcript ? transcript : mess, you: res.data.reply });
       setFile("");
@@ -116,7 +122,7 @@ function App() {
     } catch (error) {
       setStory([
         ...mstory,
-        { me: mess, you: "Xin lỗi tôi không thể trả lời câu hỏi của bạn" },
+        { me: mess, you: "Sorry I can't answer your question" },
       ]);
     } finally {
       setLoading(false);
