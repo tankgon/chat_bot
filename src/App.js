@@ -80,7 +80,7 @@ function App() {
       const cloudinaryData = await cloudinaryResponse.json();
       const imageUrl = await cloudinaryData.url;
 
-      const res = await axios.post("http://192.168.1.17:8080/chat-with-file", {
+      const res = await axios.post("https://chat-gpt-server-wk4y.onrender.com/chat-with-file", {
         topic: mess == "" ? "Hello" : response ? response : mess,
         message: mess,
         filePath: imageUrl,
@@ -105,13 +105,14 @@ function App() {
   const handleTextUpload = async () => {
     try {
       setLoading(true);
-      const res = await axios.post("http://192.168.1.17:8080/chat", {
+      const res = await axios.post("https://chat-gpt-server-wk4y.onrender.com/chat", {
         topic: mess == "" ? "Hello" : response ? response : mess,
         message: transcript ? transcript : mess,
       });
       setRespon(res.data.reply);
       mstory.push({ me: transcript ? transcript : mess, you: res.data.reply });
       setFile("");
+      resetTranscript();
     } catch (error) {
       setStory([
         ...mstory,
