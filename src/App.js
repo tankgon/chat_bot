@@ -17,12 +17,10 @@ function App() {
   const [mstory, setStory] = useState([]);
   const [mess, setMess] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
-
   const [previewImage, setPreviewImage] = useState(null);
-
   const [response, setRespon] = useState("");
-
   const [file, setFile] = useState("");
+  const [dataAudio, setDataAudio] = useState("");
 
   const chatboxRef = useRef();
 
@@ -67,20 +65,23 @@ function App() {
       const cloudinaryData = await cloudinaryResponse.json();
       const imageUrl = await cloudinaryData.url;
 
-      const res = await axios.post(
-        "https://chat-gpt-server-wk4y.onrender.com/chat-with-file",
-        {
-          topic: mess == "" ? "Hello" : response ? response : mess,
-          message: mess,
-          filePath: imageUrl,
-        }
-      );
+      const res = await axios.post("http://192.168.1.17:8080/chat-with-file", {
+        topic: mess == "" ? "Hello" : response ? response : mess,
+        message: mess,
+        filePath: imageUrl,
+      });
 
       setRespon(res.data.reply);
-      setStory([...mstory, { me: mess, you: res.data.reply }]);
+      setStory([
+        ...mstory,
+        { me: mess, fileName: file.name, you: res.data.result.text },
+      ]);
       setFile("");
     } catch (error) {
-      setStory([...mstory, { me: mess, you: "Xin lỗi file quá lớn" }]);
+      setStory([
+        ...mstory,
+        { me: mess, fileName: file.name, you: "Xin lỗi file quá lớn" },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -89,13 +90,10 @@ function App() {
   const handleTextUpload = async () => {
     try {
       setLoading(true);
-      const res = await axios.post(
-        "https://chat-gpt-server-wk4y.onrender.com/chat",
-        {
-          topic: mess == "" ? "Hello" : response ? response : mess,
-          message: mess,
-        }
-      );
+      const res = await axios.post("http://192.168.1.17:8080/chat", {
+        topic: mess == "" ? "Hello" : response ? response : mess,
+        message: mess,
+      });
       setRespon(res.data.reply);
       mstory.push({ me: mess, you: res.data.reply });
       setFile("");
@@ -147,8 +145,24 @@ function App() {
         const formData = new FormData();
         formData.append("file", audioFile);
         // mutation.mutate(formData);
+        formData.append("upload_preset", "hsv-ioffice");
+        formData.append("cloud_name", "df2s6srdu");
+        formData.append("folder", "hsv-ioffice");
+        const cloudinaryResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/df2s6srdu/upload`,
+          {
+            method: "post",
+            body: formData,
+          }
+        );
+        const cloudinaryData = await cloudinaryResponse.json();
+        const imageUrl = await cloudinaryData.url;
+
+        console.log(imageUrl);
       }
       console.log("Recording stopped. Audio data:", result.value);
+
+      setDataAudio(result.value);
     } catch (error) {
       console.error("Failed to stop recording:", error);
     }
@@ -158,6 +172,10 @@ function App() {
 
   return (
     <div className="top-0">
+      {/* <div>
+        <input type="file" accept="audio/*" onChange={handleFileChange1} />
+        <p>Transcription: {transcription}</p>
+      </div> */}
       <div
         id="chat-container"
         className="fixed right-4 bottom-4 w-[20rem] md:w-[20rem] lg:w-[30rem]">
@@ -181,8 +199,8 @@ function App() {
                 viewBox="0 0 24 24"
                 stroke="currentColor">
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   strokeWidth="2"
                   d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -195,6 +213,14 @@ function App() {
             {mstory.map((items, index) => {
               return (
                 <div key={index}>
+                  {items.fileName ? (
+                    <div className="mb-2 text-right">
+                      <p className="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block max-w-[20rem] text-left">
+                        {items.fileName}
+                      </p>
+                    </div>
+                  ) : null}
+
                   <div className="mb-2 text-right">
                     <p className="bg-blue-500 text-white rounded-lg py-2 px-4 inline-block max-w-[20rem] text-left">
                       {items.me}
