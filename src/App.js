@@ -225,7 +225,7 @@ function App() {
               </svg>
             </button>
           </div>
-          <p> {listening ? "Microphone: on" : null}</p>
+          {/* <p> {listening ? "Microphone: on" : null}</p> */}
           <div
             id="chatbox"
             ref={chatboxRef}
@@ -327,29 +327,22 @@ function App() {
               type="file"
               onChange={handleFileChange}></input>
 
-            {/* {!isRecording ? (
-              <Button onClick={startRecording}>
-                <Mic className="cursor-pointer" color="#1F336A" />
-              </Button>
-            ) : null} */}
-
             <Button onClick={SpeechRecognition.startListening}>
-              <Mic className="cursor-pointer" color="#1F336A" />
+              {!listening ? (
+                <Mic className="cursor-pointer" color="#1F336A" />
+              ) : (
+                <Audio
+                  height="23"
+                  width="23"
+                  color="#4fa94d"
+                  ariaLabel="audio-loading"
+                  visible={true}
+                />
+              )}
             </Button>
-
-            {isRecording ? (
-              <>
-                <Button onClick={stopRecording}>
-                  <Audio
-                    height="23"
-                    width="23"
-                    color="#4fa94d"
-                    ariaLabel="audio-loading"
-                    visible={true}
-                  />
-                </Button>
-              </>
-            ) : null}
+            {/* <Button onClick={SpeechRecognition.startListening}>
+              <Mic className="cursor-pointer" color="#1F336A" />
+            </Button> */}
 
             <button
               disabled={loading}
