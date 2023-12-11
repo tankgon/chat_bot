@@ -327,7 +327,12 @@ function App() {
               type="file"
               onChange={handleFileChange}></input>
 
-            <Button onClick={SpeechRecognition.startListening}>
+            <Button
+              onClick={
+                !listening
+                  ? SpeechRecognition.startListening
+                  : SpeechRecognition.stopListening
+              }>
               {!listening ? (
                 <Mic className="cursor-pointer" color="#1F336A" />
               ) : (
