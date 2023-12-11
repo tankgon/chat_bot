@@ -7,6 +7,10 @@ import { Mic } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { TfiLink } from "react-icons/tfi";
 import { Audio } from "react-loader-spinner";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+
 import "./App.css";
 
 function App() {
@@ -21,13 +25,24 @@ function App() {
   const [response, setRespon] = useState("");
   const [file, setFile] = useState("");
   const [dataAudio, setDataAudio] = useState("");
-
+  console.log(mess);
   const chatboxRef = useRef();
 
   useEffect(() => {
     const chatbox = chatboxRef.current;
     chatbox.scrollTop = chatbox.scrollHeight;
   }, [mstory, loading]);
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -92,10 +107,10 @@ function App() {
       setLoading(true);
       const res = await axios.post("http://192.168.1.17:8080/chat", {
         topic: mess == "" ? "Hello" : response ? response : mess,
-        message: mess,
+        message: transcript ? transcript : mess,
       });
       setRespon(res.data.reply);
-      mstory.push({ me: mess, you: res.data.reply });
+      mstory.push({ me: transcript ? transcript : mess, you: res.data.reply });
       setFile("");
     } catch (error) {
       setStory([
@@ -168,14 +183,11 @@ function App() {
     }
   };
 
-  console.log(file);
+  // console.log(file);
 
   return (
     <div className="top-0">
-      {/* <div>
-        <input type="file" accept="audio/*" onChange={handleFileChange1} />
-        <p>Transcription: {transcription}</p>
-      </div> */}
+      <div></div>
       <div
         id="chat-container"
         className="fixed right-4 bottom-4 w-[20rem] md:w-[20rem] lg:w-[30rem]">
@@ -206,6 +218,7 @@ function App() {
               </svg>
             </button>
           </div>
+          <p> {listening ? "Microphone: on" : null}</p>
           <div
             id="chatbox"
             ref={chatboxRef}
@@ -261,6 +274,29 @@ function App() {
             </div>
           ) : null}
 
+          {transcript ? (
+            <div className="p-4 flex content-center justify-between">
+              {transcript}
+              <button
+                onClick={resetTranscript}
+                id="close-chat"
+                className="text-gray-300 hover:text-gray-400 focus:outline-none focus:text-gray-400">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+          ) : null}
+
           <div className="p-4 border-t flex content-center">
             <input
               id="user-input"
@@ -284,11 +320,16 @@ function App() {
               type="file"
               onChange={handleFileChange}></input>
 
-            {!isRecording ? (
+            {/* {!isRecording ? (
               <Button onClick={startRecording}>
                 <Mic className="cursor-pointer" color="#1F336A" />
               </Button>
-            ) : null}
+            ) : null} */}
+
+            <Button onClick={SpeechRecognition.startListening}>
+              <Mic className="cursor-pointer" color="#1F336A" />
+            </Button>
+
             {isRecording ? (
               <>
                 <Button onClick={stopRecording}>
