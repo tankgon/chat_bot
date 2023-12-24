@@ -58,7 +58,6 @@ function App() {
       reader.readAsDataURL(file);
     }
   };
-
   const handleFileUpload = async () => {
     try {
       setLoading(true);
@@ -69,7 +68,7 @@ function App() {
       data.append("folder", "hsv-ioffice");
 
       const cloudinaryResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/df2s6srdu${
+        `${process.env.CLOUDINARY}${
           file.type === "image/png" ? "/image/upload" : "/upload"
         }`,
         {
@@ -80,14 +79,11 @@ function App() {
       const cloudinaryData = await cloudinaryResponse.json();
       const imageUrl = await cloudinaryData.url;
 
-      const res = await axios.post(
-        "https://chat-gpt-server-wk4y.onrender.com/chat-with-file",
-        {
-          topic: mess == "" ? "Hello" : response ? response : mess,
-          message: mess,
-          filePath: imageUrl,
-        }
-      );
+      const res = await axios.post("http://192.168.1.17:8080/chat-with-file", {
+        topic: mess == "" ? "Hello" : response ? response : mess,
+        message: mess,
+        filePath: imageUrl,
+      });
 
       setRespon(res.data.reply);
       setStory([
@@ -104,17 +100,13 @@ function App() {
       setLoading(false);
     }
   };
-
   const handleTextUpload = async () => {
     try {
       setLoading(true);
-      const res = await axios.post(
-        "https://chat-gpt-server-wk4y.onrender.com/chat",
-        {
-          topic: mess == "" ? "Hello" : response ? response : mess,
-          message: transcript ? transcript : mess,
-        }
-      );
+      const res = await axios.post("http://192.168.1.17:8080/chat", {
+        topic: mess == "" ? "Hello" : response ? response : mess,
+        message: transcript ? transcript : mess,
+      });
       setRespon(res.data.reply);
       mstory.push({ me: transcript ? transcript : mess, you: res.data.reply });
       setFile("");
@@ -141,12 +133,10 @@ function App() {
       console.error("Failed to start recording:", error || data);
     }
   };
-
   const convertToWav = (audioBuffer) => {
     const wavBuffer = audioBufferToWav(audioBuffer);
     return new Blob([wavBuffer], { type: "audio/wav" });
   };
-
   const stopRecording = async () => {
     try {
       const result = await VoiceRecorder.stopRecording();
@@ -171,7 +161,7 @@ function App() {
         formData.append("cloud_name", "df2s6srdu");
         formData.append("folder", "hsv-ioffice");
         const cloudinaryResponse = await fetch(
-          `https://api.cloudinary.com/v1_1/df2s6srdu/upload`,
+          `${process.env.CLOUDINARY}/upload`,
           {
             method: "post",
             body: formData,
@@ -194,7 +184,10 @@ function App() {
 
   return (
     <div className="top-0">
-      <div></div>
+      <div className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Click me
+      </div>
+
       <div
         id="chat-container"
         className="fixed right-4 bottom-4 w-[20rem] md:w-[20rem] lg:w-[30rem]">
@@ -225,7 +218,6 @@ function App() {
               </svg>
             </button>
           </div>
-          {/* <p> {listening ? "Microphone: on" : null}</p> */}
           <div
             id="chatbox"
             ref={chatboxRef}
@@ -345,10 +337,6 @@ function App() {
                 />
               )}
             </Button>
-            {/* <Button onClick={SpeechRecognition.startListening}>
-              <Mic className="cursor-pointer" color="#1F336A" />
-            </Button> */}
-
             <button
               disabled={loading}
               onClick={() => {
